@@ -1,0 +1,16 @@
+.bush {
+  display: flex;
+  flex-direction: row;
+  width: 200px;
+  justify-content: space-between;
+}
+
+
+
+/* .flexbox-bushes {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  height: 60px;
+} */
