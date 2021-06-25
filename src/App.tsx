@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
-
+// Jules made it
 
 type BushProps = {
   count: number,
