@@ -13,6 +13,37 @@ import cyan from './Colors/cyan.png';
 import purple from './Colors/purple.png';
 import orange from './Colors/orange.png';
 
+// keys of img elements are computed as 'keyhead + color + arr_index'
+function RoseArray(count: number, color: string, keyhead: string) {// A row of rose images
+
+  const colorKeyToPNG = function(color: string) {
+      switch (color){
+          case "red":
+            return red
+          case "blue":
+            return blue
+          case "orange":
+            return orange
+          case "purple":
+            return purple;
+          case "cyan":
+            return cyan;
+          case "green":
+            return green;
+          default:
+            throw new Error('Unknown color: ' + color);
+        }
+    }
+
+  const roseArray = [];
+  for (let i = 0; i < count; i++){
+    roseArray.push(<img key={keyhead+color+i} src={colorKeyToPNG(color)} alt=""/> )
+  }
+
+  return roseArray
+
+}
+
 
 type BushProps = {
   count: number,
@@ -31,6 +62,10 @@ isClicked: Whether or not the button should be in a clicked state
 function Bush(props: BushProps) {
   const gameUpdate = props.gameUpdate;
   const isClicked = props.isClicked;
+
+  const capitalizeFirst = function(text: string) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
 
   const colorKeyToPNG = function(color: string) {
     switch (color){
@@ -60,17 +95,17 @@ function Bush(props: BushProps) {
     <div className="bush">
       <div className="bush-row1">
         <div className="bush-row1-cell">
-          {props.color}
+          <b>{capitalizeFirst(props.color)}</b>
         </div>
         <div className="bush-row1-cell">
-          {roseArray}
+          {RoseArray(props.count, props.color, "state")}
         </div>
       </div>
       {isClicked 
-      ? <Button className="rose-button" variant="outlined" color="secondary" onClick={() => gameUpdate(1)}>Put Back</Button>
+      ? <Button className="rose-button" variant="contained" color="secondary" onClick={() => gameUpdate(1)}>Put Back</Button>
       : props.colorsCapped || props.count === 0
         ? <Button className="rose-button"  variant="outlined" disabled>Colors Capped</Button>
-        : <Button className="rose-button"  variant="outlined" color="primary" onClick={() => gameUpdate(-1)}>Pick Rose</Button>
+        : <Button className="rose-button"  variant="contained" color="primary" onClick={() => gameUpdate(-1)}>Pick Rose</Button>
       }
     </div>
   );
@@ -134,6 +169,7 @@ useEffect(() => {
 let stateKeyArr = Object.keys(game_state) as Array<keyof colorSet>;
 let bufferKeyArr = Object.keys(game_buffer) as Array<keyof colorSet>;
 
+const pickedRoses = bufferKeyArr.map((key) => RoseArray(game_buffer[key], key, "picked")).flat();
 
 return (
   <>
@@ -171,9 +207,12 @@ return (
         }}
        />)
     }</div>
+
     <br/>
-    {bufferKeyArr.map((key) => <div key={key}>{key} roses: {game_buffer[key]}</div>)}
+    <div>Picked Roses:</div>
+    {pickedRoses}
     <br/>
+
     <div className="update">
       <Button className="update-button" variant="outlined" onClick={() => {// Move buffered changes into game state
                 setGameBuffer(buffer_init);
@@ -186,11 +225,15 @@ return (
       <div>Current Player is {curr_player ? 1 : 2}</div>
       <div>Colors are{colorsCapped ? "" : " not"} capped</div>
     </div>
+    <br/>
+    <div className="rules"> <strong>How to Play:</strong> On your move you can either 
+      <ol>
+        <li>Take one rose of any color</li> 
+        <li>Take two roses of differing colors</li>
+      </ol>
+      The Winner is the player who takes the final rose. 
+    </div>
     <img src={Dice} alt="Dice"/>
-    <img src={Luffy} alt="Money D. Luffy"/>
-    <img src={Luffy} alt="Money D. Luffy"/>
-    <img src={Luffy} alt="Money D. Luffy"/>
-    <img src={Luffy} alt="Money D. Luffy"/>
     <img src={Luffy} alt="Money D. Luffy"/>
     <img src={Luffy} alt="Money D. Luffy"/>
 
