@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
 
+import { Button } from '@material-ui/core';
 
 type BushProps = {
   count: number,
@@ -23,17 +24,19 @@ function Bush(props: BushProps) {
 
   return (
     <div className="bush">
-      <div>
-        {props.color}
-      </div>
-      <div>
-        {props.count}
+      <div className="bush-row1">
+        <div className="bush-row1-cell">
+          {props.color}
+        </div>
+        <div className="bush-row1-cell">
+          {props.count}
+        </div>
       </div>
       {isClicked 
-      ? <button onClick={() => gameUpdate(1)}>Put Back</button>
+      ? <Button className="rose-button" variant="outlined" color="secondary" onClick={() => gameUpdate(1)}>Put Back</Button>
       : props.colorsCapped || props.count === 0
-        ? <b>Nope</b>
-        : <button onClick={() => gameUpdate(-1)}>Pick Rose</button>
+        ? <Button className="rose-button"  variant="outlined" disabled>Colors Capped</Button>
+        : <Button className="rose-button"  variant="outlined" color="primary" onClick={() => gameUpdate(-1)}>Pick Rose</Button>
       }
     </div>
   );
@@ -137,16 +140,18 @@ return (
     <br/>
     {bufferKeyArr.map((key) => <div key={key}>{key} roses: {game_buffer[key]}</div>)}
     <br/>
-    <button onClick={() => {// Move buffered changes into game state
-              setGameBuffer(buffer_init);
-              setCurrPlayer(!curr_player);
-              setColorsCapped(false);
-              setButtonIsClicked(button_is_clicked_init);
-      }}>
-      Update State
-    </button>
-    <div>Current Player is {curr_player ? 1 : 2}</div>
-    <div>Colors are{colorsCapped ? "" : " not"} capped</div>
+    <div className="update">
+      <Button className="update-button" variant="outlined" onClick={() => {// Move buffered changes into game state
+                setGameBuffer(buffer_init);
+                setCurrPlayer(!curr_player);
+                setColorsCapped(false);
+                setButtonIsClicked(button_is_clicked_init);
+        }}>
+        Update State
+      </Button>
+      <div>Current Player is {curr_player ? 1 : 2}</div>
+      <div>Colors are{colorsCapped ? "" : " not"} capped</div>
+    </div>
   </>
 )
 
