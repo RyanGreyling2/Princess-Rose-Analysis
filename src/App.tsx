@@ -209,8 +209,8 @@ return (
     }</div>
 
     <br/>
-    <div>Picked Roses:</div>
-    {pickedRoses}
+    <div><b>Picked Roses:</b></div>
+      <div className="picked-rose-arr">{pickedRoses}</div>
     <br/>
 
     <div className="update">
@@ -223,7 +223,6 @@ return (
         Update State
       </Button>
       <div>Current Player is {curr_player ? 1 : 2}</div>
-      <div>Colors are{colorsCapped ? "" : " not"} capped</div>
     </div>
     <br/>
     <div className="rules"> <strong>How to Play:</strong> On your move you can either 

@@ -1,6 +1,6 @@
 .bush {
   display: table;
-  width: 80px;
+  width: 100px;
 }
 
 /* .bush-row1 {
@@ -37,6 +37,10 @@
 .update-button {
   margin: auto;
   width: 50%;
+}
+
+.picked-rose-arr {
+  height: 20px;
 }
 
 .rules {
