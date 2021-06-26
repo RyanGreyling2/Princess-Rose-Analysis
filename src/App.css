@@ -1,16 +1,40 @@
 .bush {
+  display: table;
+  width: 80px;
+}
+
+.bush-row1 {
+  display: table-row
+}
+
+.bush-row1-cell {
+  display: table-cell
+}
+
+.rose-button {
+  padding: 0;
+  width: 100%;
+}
+
+.flexbox-bushes {
+  padding-top: 20px;
+  padding-right: 50px;
+  padding-left: 20px;
+
   display: flex;
   flex-direction: row;
-  width: 200px;
   justify-content: space-between;
 }
 
+.update {
+  margin: auto;
+  width: 25%;
 
-
-/* .flexbox-bushes {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  height: 60px;
-} */
+}
+
+.update-button {
+  margin: auto;
+  width: 50%;
+}
