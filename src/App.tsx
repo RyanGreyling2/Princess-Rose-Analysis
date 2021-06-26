@@ -1,7 +1,19 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
+// Jules made it
 
 import { Button } from '@material-ui/core';
+
+import Dice from './PNG_transparency_demonstration_1.png';
+import Luffy from './Luffy.jpg';
+import red from './Colors/red.png';
+import blue from './Colors/blue.png';
+import green from './Colors/green.png';
+import cyan from './Colors/cyan.png';
+import purple from './Colors/purple.png';
+import orange from './Colors/orange.png';
+import { kMaxLength } from 'buffer';
+
 
 type BushProps = {
   count: number,
@@ -21,7 +33,30 @@ function Bush(props: BushProps) {
   const gameUpdate = props.gameUpdate;
 
   const isClicked = props.isClicked;
-
+  const roseArray = [];
+  let color = red;
+  switch (props.color){
+    case "red":
+      color = red;
+      break
+    case "blue":
+      color = blue;
+      break
+    case "orange":
+      color = orange;
+      break
+    case "purple":
+      color = purple;
+      break
+    case "cyan":
+      color = cyan;
+      break
+    case "green":
+      color = green;
+  }
+  for (let i = 0; i < props.count; i++){
+    roseArray.push(<img src={color}/> )
+  }
   return (
     <div className="bush">
       <div className="bush-row1">
@@ -29,7 +64,7 @@ function Bush(props: BushProps) {
           {props.color}
         </div>
         <div className="bush-row1-cell">
-          {props.count}
+          {roseArray}
         </div>
       </div>
       {isClicked 
@@ -152,6 +187,61 @@ return (
       <div>Current Player is {curr_player ? 1 : 2}</div>
       <div>Colors are{colorsCapped ? "" : " not"} capped</div>
     </div>
+    <img src={Dice} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Luffy} alt="Yellow Rose"/>
   </>
 )
 
