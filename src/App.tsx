@@ -1,18 +1,17 @@
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import './App.css';
-// Jules made it
 
 import { Button } from '@material-ui/core';
 
 import Dice from './PNG_transparency_demonstration_1.png';
 import Luffy from './Luffy.jpg';
+
 import red from './Colors/red.png';
 import blue from './Colors/blue.png';
 import green from './Colors/green.png';
 import cyan from './Colors/cyan.png';
 import purple from './Colors/purple.png';
 import orange from './Colors/orange.png';
-import { kMaxLength } from 'buffer';
 
 
 type BushProps = {
@@ -31,32 +30,32 @@ isClicked: Whether or not the button should be in a clicked state
 */
 function Bush(props: BushProps) {
   const gameUpdate = props.gameUpdate;
-
   const isClicked = props.isClicked;
+
+  const colorKeyToPNG = function(color: string) {
+    switch (color){
+        case "red":
+          return red
+        case "blue":
+          return blue
+        case "orange":
+          return orange
+        case "purple":
+          return purple;
+        case "cyan":
+          return cyan;
+        case "green":
+          return green;
+        default:
+          throw new Error('Unknown color: ' + color);
+      }
+  }
+
   const roseArray = [];
-  let color = red;
-  switch (props.color){
-    case "red":
-      color = red;
-      break
-    case "blue":
-      color = blue;
-      break
-    case "orange":
-      color = orange;
-      break
-    case "purple":
-      color = purple;
-      break
-    case "cyan":
-      color = cyan;
-      break
-    case "green":
-      color = green;
-  }
   for (let i = 0; i < props.count; i++){
-    roseArray.push(<img src={color}/> )
+    roseArray.push(<img src={colorKeyToPNG(props.color)} alt=""/> )
   }
+
   return (
     <div className="bush">
       <div className="bush-row1">
@@ -101,8 +100,8 @@ let game_state_init: colorSet = {// Game State: Roses remaining on each Bush
   blue: 5,
   green: 5,
   purple: 5,
-  orange: 0,
-  cyan: 0,
+  orange: 5,
+  cyan: 5,
 };
 let buffer_init: colorSet = {// Buffer to cache potential changes to Game State
   red: 0,
@@ -113,7 +112,7 @@ let buffer_init: colorSet = {// Buffer to cache potential changes to Game State
   cyan: 0,
 };
 
-let button_is_clicked_init: colorSetBool = {
+let button_is_clicked_init: colorSetBool = {// Controls the state of the button in each bush
   red: false,
   blue: false,
   green: false,
@@ -187,61 +186,14 @@ return (
       <div>Current Player is {curr_player ? 1 : 2}</div>
       <div>Colors are{colorsCapped ? "" : " not"} capped</div>
     </div>
-    <img src={Dice} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
-    <img src={Luffy} alt="Yellow Rose"/>
+    <img src={Dice} alt="Dice"/>
+    <img src={Luffy} alt="Money D. Luffy"/>
+    <img src={Luffy} alt="Money D. Luffy"/>
+    <img src={Luffy} alt="Money D. Luffy"/>
+    <img src={Luffy} alt="Money D. Luffy"/>
+    <img src={Luffy} alt="Money D. Luffy"/>
+    <img src={Luffy} alt="Money D. Luffy"/>
+
   </>
 )
 
