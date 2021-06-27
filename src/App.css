@@ -1,3 +1,9 @@
+
+h1 {
+  text-align: center;
+  margin-bottom: 0;
+}
+
 .bush {
   display: table;
   width: 100px;
@@ -17,13 +23,20 @@
 }
 
 .flexbox-bushes {
-  padding-top: 20px;
+  margin: auto;
+  width: 75%;
+
+  /* padding-top: 20px;
   padding-right: 50px;
-  padding-left: 20px;
+  padding-left: 20px; */
 
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+#between-main-picked {
+  line-height: 20px;
 }
 
 .update {

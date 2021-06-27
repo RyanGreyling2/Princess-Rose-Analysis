@@ -173,6 +173,7 @@ const pickedRoses = bufferKeyArr.map((key) => RoseArray(game_buffer[key], key, "
 
 return (
   <>
+    <h1>Princess and Roses Game</h1>
     <div className="flexbox-bushes">{stateKeyArr.map((key) => 
       <Bush key={key} color={key} count={game_state[key]} colorsCapped={colorsCapped} isClicked={button_is_clicked[key]}
         gameUpdate={(change) => { 
@@ -208,7 +209,7 @@ return (
        />)
     }</div>
 
-    <br/>
+    <div id="between-main-picked">&nbsp;</div>
     <div><b>Picked Roses:</b></div>
       <div className="picked-rose-arr">{pickedRoses}</div>
     <br/>
