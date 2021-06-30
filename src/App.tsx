@@ -3,9 +3,6 @@ import './App.css';
 
 import { Button } from '@material-ui/core';
 
-import Dice from './PNG_transparency_demonstration_1.png';
-import Luffy from './Luffy.jpg';
-
 import red from './Colors/red.png';
 import blue from './Colors/blue.png';
 import green from './Colors/green.png';
@@ -161,6 +158,7 @@ const [game_buffer, setGameBuffer] = useState(buffer_init); // buffer to cache p
 const [button_is_clicked, setButtonIsClicked] = useState(button_is_clicked_init);
 const [curr_player, setCurrPlayer] = useState(true);
 const [colorsCapped, setColorsCapped] = useState(false); // whether or not a player has already picked 2 colors for their move
+const [gameOver, setGameOver] = useState(false); // whether or not the game is over
 
 useEffect(() => {
     "pass";
@@ -220,10 +218,16 @@ return (
                 setCurrPlayer(!curr_player);
                 setColorsCapped(false);
                 setButtonIsClicked(button_is_clicked_init);
+
+                let remaining_roses = Object.values(game_state).reduce((acc,val) => acc+=val, 0);
+                if (remaining_roses === 0) setGameOver(true);
         }}>
         Update State
       </Button>
-      <div>Current Player is {curr_player ? 1 : 2}</div>
+      <div>{ gameOver
+        ? `Game over. Winner is player ${curr_player ? 2 : 1}`
+        : `Current Player is ${curr_player ? 1 : 2}`
+      }</div>
     </div>
     <br/>
     <div className="rules"> <strong>How to Play:</strong> On your move you can either 
@@ -233,9 +237,6 @@ return (
       </ol>
       The Winner is the player who takes the final rose. 
     </div>
-    <img src={Dice} alt="Dice"/>
-    <img src={Luffy} alt="Money D. Luffy"/>
-    <img src={Luffy} alt="Money D. Luffy"/>
 
   </>
 )
