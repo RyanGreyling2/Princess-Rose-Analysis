@@ -158,6 +158,118 @@ type colorSet = {
   cyan: number,
 };
 
+async function isWinning(game: number[]) { // Returns True if in winning position, false if in losing position
+  type cache = { [key: number] : string[] };
+
+  let cache_loss: cache = {}; // Cache of positions known to be losing
+  let cache_win: cache = {}; // Cache of large positions known to be winning
+
+  const getCacheIndex = function(game: number[]) {
+    return game.reduce((acc, val) => acc+val, 0);
+  }
+
+  const inCache = function(game: number[], cache: cache): boolean {
+    let cache_index = getCacheIndex(game);
+    if (cache.hasOwnProperty(cache_index)) {
+      let arr = cache[cache_index];
+      if (arr.includes(JSON.stringify(game.sort()))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  const addToCache = function(game: number[], cache: cache): void {
+    let cache_index = getCacheIndex(game);
+    if (cache.hasOwnProperty(cache_index)) {
+      cache[cache_index].push(JSON.stringify(game.sort()));
+    } else {
+      cache[cache_index] = [JSON.stringify(game.sort())];
+    }
+  }
+
+  async function isWinning_aux(game: number[], head=true, child=false) {
+
+  if (inCache(game, cache_loss)) return false;
+  if (getCacheIndex(game) > 18 && inCache(game, cache_win)) return true;
+
+  if (game.includes(0)) {
+    // Game is solved for less than 6 colors
+    // See: "The Princess and Some Roses" by Kenjoe Lim
+
+    let new_game = game.filter((count) => count !== 0)
+    new_game.sort().reverse();
+    if (new_game.length < 5) new_game = new_game.concat(Array(5-new_game.length).fill(0))
+    new_game = new_game.map((count) => count % 2);
+
+    switch(JSON.stringify(new_game)) { // The four types of losing positions
+      case "[0,0,0,0,0]":
+      case "[1,1,1,0,0]":
+      case "[0,1,1,1,1]":
+      case "[1,0,0,1,1]":
+      if (child || head) {
+        console.log("Losing Position: 5 colors or less");
+        if (child) console.log(game);
+      }
+      return false;
+    }
+
+    return true; // Winning position if not one of the four types
+  }
+
+  // Otherwise we perform recursive search
+  for (let i=0; i<game.length; i++) {
+    if (game[i] <= 0) continue;
+
+    let new_game: number[] = [];
+    Object.assign(new_game, game);
+    new_game[i] -= 1;
+
+    let result = await isWinning_aux(new_game, false, head);
+    if (!result) {
+      if (head) console.log("Winning Position");
+      if (getCacheIndex(game) > 18) addToCache(game, cache_win);
+      return true;
+    }
+  }
+
+  for (let i=0; i<game.length; i++) {
+    for (let j=i+1; j<game.length; j++) {
+      if (game[i] <= 0 || game[j] <= 0) continue;
+
+      let new_game: number[] = [];
+      Object.assign(new_game, game);
+      new_game[i] -= 1;
+      new_game[j] -= 1;
+
+      let result = await isWinning_aux(new_game, false, head);
+      if (!result) {
+        if (head) console.log("Winning Position");
+        if (getCacheIndex(game) > 18) addToCache(game, cache_win);
+        return true;
+      }
+    }
+  }
+
+  if (child) {
+    console.log("Losing Position child found as");
+    console.log(game);
+  }
+  if (head) {
+    console.log("Losing Position");
+  }
+
+  addToCache(game, cache_loss);
+  return false;
+  } // End of isWinning_aux
+
+  let result = await isWinning_aux(game);
+  console.log(cache_loss);
+  console.log(cache_win);
+  return result;
+}
+
+
 type colorSetBool = {
   red: boolean,
   blue: boolean,
@@ -225,7 +337,7 @@ useEffect(() => { // handle changes to game_history_index
   if (remaining_roses === 0) setGameOver(true);
 }, [game_history_index, game_history]);
 
-let stateKeyArr = Object.keys(game_state) as Array<keyof colorSet>;
+let stateKeyArr  = Object.keys(game_state) as Array<keyof colorSet>;
 let bufferKeyArr = Object.keys(game_buffer) as Array<keyof colorSet>;
 
 const pickedRoses = bufferKeyArr.map((key) => RoseArray(game_buffer[key], key, "picked")).flat();
@@ -311,6 +423,7 @@ return (
         Next Move
       </Button>}
       <GameSetup init={game_state_init} setGameStateSetup={setGameStateSetup}/>
+      <button onClick={() => {console.log("Beginning Analysis"); isWinning(Object.values(game_state))}}>Analyze Current Position</button>
   </>
 )
 
