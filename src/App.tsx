@@ -10,6 +10,12 @@ import cyan from './Colors/cyan.png';
 import purple from './Colors/purple.png';
 import orange from './Colors/orange.png';
 
+// Helper functions
+const capitalizeFirst = function(text: string) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+// End of Helper functions
+
 // keys of img elements are computed as 'keyhead + color + arr_index'
 function RoseArray(count: number, color: string, keyhead: string) {// A row of rose images
 
@@ -60,10 +66,6 @@ function Bush(props: BushProps) {
   const gameUpdate = props.gameUpdate;
   const isClicked = props.isClicked;
 
-  const capitalizeFirst = function(text: string) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  }
-
   const colorKeyToPNG = function(color: string) {
     switch (color){
         case "red":
@@ -92,7 +94,7 @@ function Bush(props: BushProps) {
     <div className="bush">
       <div className="bush-row1">
         <div className="bush-row1-cell">
-          <b>{capitalizeFirst(props.color)}</b>
+          <b>{capitalizeFirst(props.color)} {props.count}</b>
         </div>
         <div className="bush-row1-cell">
           {RoseArray(props.count, props.color, "state")}
@@ -104,6 +106,9 @@ function Bush(props: BushProps) {
         ? <Button className="rose-button"  variant="outlined" disabled>{props.count === 0 ? "Empty" : "Colors Capped"}</Button>
         : <Button className="rose-button"  variant="contained" color="primary" onClick={() => gameUpdate(-1)}>Pick Rose</Button>
       }
+      {isClicked
+      ? RoseArray(1, props.color, "picked")
+      : <></>}
     </div>
   );
 }
@@ -119,10 +124,9 @@ function RoseCounter(props: RoseCounterProps) { // Counter used to help setup ne
 
   return (
     <>
-    <div>{props.color}</div>
-    {props.count}
-    <button onClick={()=> {if (props.count !== 0) setCount(props.count-1)}}>{"-"}</button>
-    <button onClick={()=> {setCount(props.count+1)}}>{"+"}</button>
+    <b>{capitalizeFirst(props.color)} {props.count}</b>
+    <Button variant="outlined" onClick={()=> {if (props.count !== 0) setCount(props.count-1)}}>{"-"}</Button>
+    <Button variant="outlined" onClick={()=> {setCount(props.count+1)}}>{"+"}</Button>
     </>
   )
 }
@@ -134,7 +138,8 @@ function GameSetup(props: {init: colorSet, setGameStateSetup: (init: colorSet) =
   const [game_setup_cache, setGameSetupCache] = useState(init); // Cache updates to the initial game state
 
   return (
-    <>
+  <>
+    <div className="setup">
     {initKeyArr.map((key) => <RoseCounter key={key + "Setup"} count={game_setup_cache[key]} color={key} 
       setCount={(count) => {
         let new_game_setup_cache = {} as colorSet;
@@ -142,10 +147,11 @@ function GameSetup(props: {init: colorSet, setGameStateSetup: (init: colorSet) =
         new_game_setup_cache[key] = count;
         setGameSetupCache(new_game_setup_cache);
       }}/>)}
-      <Button onClick={() => props.setGameStateSetup(game_setup_cache)}>
+    </div>
+    <Button onClick={() => props.setGameStateSetup(game_setup_cache)}>
         Setup New Game
-      </Button>
-    </>
+    </Button>
+  </>
   )
 }
 
@@ -338,9 +344,6 @@ useEffect(() => { // handle changes to game_history_index
 }, [game_history_index, game_history]);
 
 let stateKeyArr  = Object.keys(game_state) as Array<keyof colorSet>;
-let bufferKeyArr = Object.keys(game_buffer) as Array<keyof colorSet>;
-
-const pickedRoses = bufferKeyArr.map((key) => RoseArray(game_buffer[key], key, "picked")).flat();
 
 return (
   <>
@@ -381,24 +384,35 @@ return (
        />)
     }</div>
 
-    <div id="between-main-picked">&nbsp;</div>
-    <div><b>Picked Roses:</b></div>
-      <div className="picked-rose-arr">{pickedRoses}</div>
-    <br/>
+    <div className="blank-line">&nbsp;</div>
 
     <div className="update">
+      {game_history_index !== 0 ?
+      <Button onClick={() => setGameHistoryIndex(game_history_index - 1)}>
+        Previous Move
+      </Button>
+    :  <Button disabled>
+        Previous Move
+      </Button>}
+      {game_history_index !== game_history.length-1 ?
+      <Button onClick={() => setGameHistoryIndex(game_history_index + 1)}>
+        Next Move
+      </Button>
+    : <Button disabled>
+        Next Move
+      </Button>}
       <Button className="update-button" variant="outlined" onClick={() => {
               // Add current game_state to history and increment index
               let new_index = game_history_index + 1;
               setGameHistory([...game_history.slice(0, new_index), game_state]);
               setGameHistoryIndex(new_index);
-        }}>
-        Update State
+              }}>
+        { gameOver
+          ? `Game over. Winner is player ${curr_player ? 2 : 1}`
+          : `Confirm Move (Player ${curr_player ? 1 : 2})`
+        }
       </Button>
-      <div>{ gameOver
-        ? `Game over. Winner is player ${curr_player ? 2 : 1}`
-        : `Current Player is ${curr_player ? 1 : 2}`
-      }</div>
+      <Button onClick={() => {console.log("Beginning Analysis"); isWinning(Object.values(game_state))}}>Analyze Current Position</Button>
     </div>
     <br/>
     <div className="rules"> <strong>How to Play:</strong> On your move you can either 
@@ -408,22 +422,8 @@ return (
       </ol>
       The Winner is the player who takes the final rose. 
     </div>
-    {game_history_index !== 0 ?
-      <Button onClick={() => setGameHistoryIndex(game_history_index - 1)}>
-        Previous Move
-      </Button>
-    :  <Button disabled>
-        Previous Move
-      </Button>}
-    {game_history_index !== game_history.length-1 ?
-      <Button onClick={() => setGameHistoryIndex(game_history_index + 1)}>
-        Next Move
-      </Button>
-    : <Button disabled>
-        Next Move
-      </Button>}
-      <GameSetup init={game_state_init} setGameStateSetup={setGameStateSetup}/>
-      <button onClick={() => {console.log("Beginning Analysis"); isWinning(Object.values(game_state))}}>Analyze Current Position</button>
+    <div className="blank-line">&nbsp;</div>
+    <GameSetup init={game_state_init} setGameStateSetup={setGameStateSetup}/>
   </>
 )
 
