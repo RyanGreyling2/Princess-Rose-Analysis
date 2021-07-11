@@ -136,6 +136,14 @@ function GameSetup(props: {init: colorSet, setGameStateSetup: (init: colorSet) =
   let initKeyArr = Object.keys(init) as Array<keyof colorSet>;
 
   const [game_setup_cache, setGameSetupCache] = useState(init); // Cache updates to the initial game state
+  const [isConfirm, setIsConfirm] = useState(false); // Whether or not the Setup Button is flashing the confirm message
+
+  useEffect(() => {
+    if (isConfirm === true) {
+      const timer = setTimeout(() => setIsConfirm(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isConfirm]);
 
   return (
   <>
@@ -148,8 +156,8 @@ function GameSetup(props: {init: colorSet, setGameStateSetup: (init: colorSet) =
         setGameSetupCache(new_game_setup_cache);
       }}/>)}
     </div>
-    <Button onClick={() => props.setGameStateSetup(game_setup_cache)}>
-        Setup New Game
+    <Button onClick={() => {setIsConfirm(true); props.setGameStateSetup(game_setup_cache)}}>
+        {isConfirm ? "Updated!" : "Setup New Game"}
     </Button>
   </>
   )
@@ -163,8 +171,9 @@ type colorSet = {
   orange: number,
   cyan: number,
 };
-
-async function isWinning(game: number[]) { // Returns True if in winning position, false if in losing position
+// Returns True if in winning position, false if in losing position
+// Also passes a callback to display optimal moves in the case of winning positions
+async function isWinning(game: number[], callback = (game: number[]) => {}) {
   type cache = { [key: number] : string[] };
 
   let cache_loss: cache = {}; // Cache of positions known to be losing
@@ -196,7 +205,7 @@ async function isWinning(game: number[]) { // Returns True if in winning positio
 
   async function isWinning_aux(game: number[], head=true, child=false) {
 
-  if (inCache(game, cache_loss)) return false;
+  if (inCache(game, cache_loss)) { if (child) {callback(game)} return false;}
   if (getCacheIndex(game) > 18 && inCache(game, cache_win)) return true;
 
   if (game.includes(0)) {
@@ -215,7 +224,10 @@ async function isWinning(game: number[]) { // Returns True if in winning positio
       case "[1,0,0,1,1]":
       if (child || head) {
         console.log("Losing Position: 5 colors or less");
-        if (child) console.log(game);
+        if (child) {
+          console.log(game);
+          callback(game);
+        }
       }
       return false;
     }
@@ -260,6 +272,7 @@ async function isWinning(game: number[]) { // Returns True if in winning positio
   if (child) {
     console.log("Losing Position child found as");
     console.log(game);
+    callback(game);
   }
   if (head) {
     console.log("Losing Position");
