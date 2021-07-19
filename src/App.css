@@ -9,6 +9,18 @@ h1 {
   width: 100px;
 }
 
+.blank-line {
+  line-height: 20px;
+}
+
+.blank-line-thin {
+  line-height: 4px;
+}
+
+.blank-height {
+  height: 24px;
+}
+
 /* .bush-row1 {
   display: table-row
 } */
@@ -35,31 +47,35 @@ h1 {
   justify-content: space-between;
 }
 
-.blank-line {
-  line-height: 20px;
-}
-
-.update {
-  margin: auto;
-  width: 25%;
-
-  display: flex;
-  flex-direction: row;
-}
-
-.update-button {
-  margin: auto;
-  width: 50%;
-}
-
 .picked-rose-arr {
   height: 20px;
 }
 
+.flexbox-main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
 .rules {
-  width: 50%;
   text-align: left;
 } 
+
+.update {
+  width: 25%;
+
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.update-button {
+  margin: auto;
+  width: 100%;
+}
+
+.next-button {
+  width: 50%;
+}
 
 .setup {
   display: flex;

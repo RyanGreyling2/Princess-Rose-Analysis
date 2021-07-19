@@ -1,8 +1,6 @@
 import {useState, useEffect} from 'react';
 import './App.css';
 
-import { Button } from '@material-ui/core';
-
 import red from './Colors/red.png';
 import blue from './Colors/blue.png';
 import green from './Colors/green.png';
@@ -10,11 +8,21 @@ import cyan from './Colors/cyan.png';
 import purple from './Colors/purple.png';
 import orange from './Colors/orange.png';
 
+import { Button, Paper, AppBar, Typography } from '@material-ui/core';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+
 // Helper functions
 const capitalizeFirst = function(text: string) {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
 // End of Helper functions
+
+// Materials-UI Styles
+const useStyles = makeStyles((theme: Theme) => createStyles({
+  title: {
+    'justify-content': "center"
+  }
+}));
 
 // keys of img elements are computed as 'keyhead + color + arr_index'
 function RoseArray(count: number, color: string, keyhead: string) {// A row of rose images
@@ -97,7 +105,7 @@ function Bush(props: BushProps) {
           <b>{capitalizeFirst(props.color)} {props.count}</b>
         </div>
         <div className="bush-row1-cell">
-          {RoseArray(props.count, props.color, "state")}
+          {props.count === 0 ? <div className="blank-line blank-height">&nbsp;</div> : RoseArray(props.count, props.color, "state")}
         </div>
       </div>
       {isClicked 
@@ -106,9 +114,10 @@ function Bush(props: BushProps) {
         ? <Button className="rose-button"  variant="outlined" disabled>{props.count === 0 ? "Empty" : "Colors Capped"}</Button>
         : <Button className="rose-button"  variant="contained" color="primary" onClick={() => gameUpdate(-1)}>Pick Rose</Button>
       }
+      <div className="blank-line-thin">&nbsp;</div>
       {isClicked
       ? RoseArray(1, props.color, "picked")
-      : <></>}
+      : <div className="blank-line blank-height">&nbsp;</div>}
     </div>
   );
 }
@@ -156,7 +165,7 @@ function GameSetup(props: {init: colorSet, setGameStateSetup: (init: colorSet) =
         setGameSetupCache(new_game_setup_cache);
       }}/>)}
     </div>
-    <Button onClick={() => {setIsConfirm(true); props.setGameStateSetup(game_setup_cache)}}>
+    <Button size='large' onClick={() => {setIsConfirm(true); props.setGameStateSetup(game_setup_cache)}}>
         {isConfirm ? "Updated!" : "Setup New Game"}
     </Button>
   </>
@@ -173,7 +182,7 @@ type colorSet = {
 };
 // Returns True if in winning position, false if in losing position
 // Also passes a callback to display optimal moves in the case of winning positions
-async function isWinning(game: number[], callback = (game: number[]) => {}) {
+async function isWinning(game: number[], callback = (result: boolean, game: number[]) => {}) {
   type cache = { [key: number] : string[] };
 
   let cache_loss: cache = {}; // Cache of positions known to be losing
@@ -203,9 +212,11 @@ async function isWinning(game: number[], callback = (game: number[]) => {}) {
     }
   }
 
-  async function isWinning_aux(game: number[], head=true, child=false) {
+  let best_move: number[] = [];
 
-  if (inCache(game, cache_loss)) { if (child) {callback(game)} return false;}
+  async function isWinning_aux(game: number[], head=true, child=false): Promise<boolean> {
+
+  if (inCache(game, cache_loss)) { if (child) {best_move = game; return false;}}
   if (getCacheIndex(game) > 18 && inCache(game, cache_win)) return true;
 
   if (game.includes(0)) {
@@ -226,7 +237,7 @@ async function isWinning(game: number[], callback = (game: number[]) => {}) {
         console.log("Losing Position: 5 colors or less");
         if (child) {
           console.log(game);
-          callback(game);
+          best_move = game;
         }
       }
       return false;
@@ -272,7 +283,7 @@ async function isWinning(game: number[], callback = (game: number[]) => {}) {
   if (child) {
     console.log("Losing Position child found as");
     console.log(game);
-    callback(game);
+    best_move = game;
   }
   if (head) {
     console.log("Losing Position");
@@ -280,12 +291,14 @@ async function isWinning(game: number[], callback = (game: number[]) => {}) {
 
   addToCache(game, cache_loss);
   return false;
-  } // End of isWinning_aux
+} // End of isWinning_aux
 
-  let result = await isWinning_aux(game);
+let result = await isWinning_aux(game);
   console.log(cache_loss);
   console.log(cache_win);
+  callback(result, best_move);
   return result;
+
 }
 
 
@@ -300,13 +313,15 @@ type colorSetBool = {
 
 // Main component
 function Game() {
+const classes = useStyles();
+
 let game_state_default: colorSet = {// Game State: Roses remaining on each Bush
-  red: 5,
-  blue: 5,
-  green: 5,
-  purple: 5,
-  orange: 5,
-  cyan: 5,
+  red: 3,
+  blue: 3,
+  green: 3,
+  purple: 3,
+  orange: 3,
+  cyan: 3,
 };
 let buffer_init: colorSet = {// Buffer to cache potential changes to Game State
   red: 0,
@@ -332,19 +347,20 @@ const [game_buffer, setGameBuffer] = useState(buffer_init); // buffer to cache p
 const [game_history, setGameHistory] = useState([game_state_init]); // history containing move history
 const [game_history_index, setGameHistoryIndex] = useState(0); // current index into game_history
 
+useEffect(() => { // handles changes to game_state_init
+  setGameHistory([game_state_init]);
+  setGameHistoryIndex(0);
+}, [game_state_init]);
+
 const [button_is_clicked, setButtonIsClicked] = useState(button_is_clicked_init);
 const [curr_player, setCurrPlayer] = useState(true);
 const [colorsCapped, setColorsCapped] = useState(false); // whether or not a player has already picked 2 colors for their move
 const [gameOver, setGameOver] = useState(false); // whether or not the game is over
 
-useEffect(() => { // handles changes to game_state_init
-  setGameHistory([game_state_init]);
-  setGameHistoryIndex(0);
-}, [game_state_init])
-
 useEffect(() => { // handle changes to game_history_index
   // update game_state
-  setGameState(game_history[game_history_index]);
+  let new_game_state = game_history[game_history_index];
+  setGameState(new_game_state);
 
   // cleanup
   setGameBuffer(buffer_init);
@@ -352,15 +368,61 @@ useEffect(() => { // handle changes to game_history_index
   setColorsCapped(false);
   setButtonIsClicked(button_is_clicked_init);
 
-  let remaining_roses = Object.values(game_state).reduce((acc,val) => acc+=val, 0);
-  if (remaining_roses === 0) setGameOver(true);
+  let remaining_roses = Object.values(new_game_state).reduce((acc,val) => acc+=val, 0);
+  if (remaining_roses === 0) {
+    setGameOver(true);
+  } else {
+    setGameOver(false);
+  }
 }, [game_history_index, game_history]);
+
+// Game Analysis States
+enum AnalysisStates {
+  Ready, Loading, Confirm
+};
+const [analysisProgress, setAnalysisProgress] = useState(AnalysisStates.Ready);
+const [analysisContent, setAnalysisContent] = useState("Default Content");
+
+const displayAnalysis = function(result: boolean, game: number[]) { // Handler for showing Game Analysis results
+  let content = "";
+  if (result) { // Winning Position
+    content = "Position is Winning";
+    if (game.length !== 0) {
+      content += " with Best Move" + JSON.stringify(game);
+    }
+  } else { // Losing Position
+    content = "Position is Losing";
+  }
+  setAnalysisProgress(AnalysisStates.Confirm);
+  setAnalysisContent(content);
+};
+
+const getAnalysisStateText = function(state: AnalysisStates) {
+  switch (state) {
+    case AnalysisStates.Ready:
+      return "Analyze Position";
+    case AnalysisStates.Loading:
+      return "Loading...";
+    case AnalysisStates.Confirm:
+      return "Analysis Complete!";
+  }
+}
+
+useEffect(() => { // After a delay, reset the Analysis button to a ready state
+  if (analysisProgress === AnalysisStates.Loading) {
+    isWinning(Object.values(game_state), displayAnalysis);
+  } else if (analysisProgress === AnalysisStates.Confirm) {
+    const timer = setTimeout(() => setAnalysisProgress(AnalysisStates.Ready), 2000);
+    return () => clearTimeout(timer);
+  }
+}, [analysisProgress]);
 
 let stateKeyArr  = Object.keys(game_state) as Array<keyof colorSet>;
 
 return (
   <>
-    <h1>Princess and Roses Game</h1>
+    <AppBar position="static"><Typography align="center" variant="h2">Princess and Roses Game</Typography></AppBar>
+    <div className="blank-line">&nbsp;</div>
     <div className="flexbox-bushes">{stateKeyArr.map((key) => 
       <Bush key={key} color={key} count={game_state[key]} colorsCapped={colorsCapped} isClicked={button_is_clicked[key]}
         gameUpdate={(change) => { 
@@ -399,41 +461,49 @@ return (
 
     <div className="blank-line">&nbsp;</div>
 
-    <div className="update">
-      {game_history_index !== 0 ?
-      <Button onClick={() => setGameHistoryIndex(game_history_index - 1)}>
-        Previous Move
+    <div className="flexbox-main">
+      <div className="rules"> <strong>How to Play:</strong> On your move you can either 
+        <ol>
+          <li>Take one rose of any color</li> 
+          <li>Take two roses of differing colors</li>
+        </ol>
+        The Winner is the player who takes the final rose. 
+      </div>
+      <div className="update">
+        <Button className="update-button" variant="outlined" onClick={() => {
+          // Add current game_state to history and increment index
+          let new_index = game_history_index + 1;
+          setGameHistory([...game_history.slice(0, new_index), game_state]);
+          setGameHistoryIndex(new_index);
+          }}>
+          { gameOver
+            ? `Game over. Winner is player ${curr_player ? 2 : 1}`
+            : `Confirm Move (Player ${curr_player ? 1 : 2})`
+          }
+        </Button>
+        {game_history_index !== 0 ?
+        <Button className="next-button" onClick={() => setGameHistoryIndex(game_history_index - 1)}>
+          Previous Move
+        </Button>
+      :  <Button className="next-button" disabled>
+          Previous Move
+        </Button>}
+        {game_history_index !== game_history.length-1 ?
+        <Button className="next-button" onClick={() => setGameHistoryIndex(game_history_index + 1)}>
+          Next Move
+        </Button>
+      : <Button className="next-button" disabled>
+          Next Move
+        </Button>}
+      </div>
+
+      <Button onClick={() => {
+        console.log("Beginning Analysis"); 
+        setAnalysisProgress(AnalysisStates.Loading); 
+        }}>
+        {getAnalysisStateText(analysisProgress)}
       </Button>
-    :  <Button disabled>
-        Previous Move
-      </Button>}
-      {game_history_index !== game_history.length-1 ?
-      <Button onClick={() => setGameHistoryIndex(game_history_index + 1)}>
-        Next Move
-      </Button>
-    : <Button disabled>
-        Next Move
-      </Button>}
-      <Button className="update-button" variant="outlined" onClick={() => {
-              // Add current game_state to history and increment index
-              let new_index = game_history_index + 1;
-              setGameHistory([...game_history.slice(0, new_index), game_state]);
-              setGameHistoryIndex(new_index);
-              }}>
-        { gameOver
-          ? `Game over. Winner is player ${curr_player ? 2 : 1}`
-          : `Confirm Move (Player ${curr_player ? 1 : 2})`
-        }
-      </Button>
-      <Button onClick={() => {console.log("Beginning Analysis"); isWinning(Object.values(game_state))}}>Analyze Current Position</Button>
-    </div>
-    <br/>
-    <div className="rules"> <strong>How to Play:</strong> On your move you can either 
-      <ol>
-        <li>Take one rose of any color</li> 
-        <li>Take two roses of differing colors</li>
-      </ol>
-      The Winner is the player who takes the final rose. 
+      <Paper>{analysisContent}</Paper>
     </div>
     <div className="blank-line">&nbsp;</div>
     <GameSetup init={game_state_init} setGameStateSetup={setGameStateSetup}/>
